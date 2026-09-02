@@ -1,7 +1,5 @@
 # Projeto de Grafos
 
-# 📚 *Contratos Nível AI*
-
 > **Disciplina:** Teoria dos Grafos
 > **Docente:** Ivan 
 > **Metodologia:** Scrum / Agile
