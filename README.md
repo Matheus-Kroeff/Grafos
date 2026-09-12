@@ -63,6 +63,7 @@ Fique à vontade para entrar em contato com os membros da equipe para dúvidas, 
 
 ## 5. 📚 Referências
 
+https://www.kaggle.com/datasets/fronkongames/steam-games-dataset?resource=download
 
 
 * CORRÊA, Barbara Priscila de Souza; COLETTA, Carolina. **O acesso ao crédito em bancos digitais e fintechs aumenta a probabilidade de endividamento pessoal no Brasil?** 2024. Disponível em: https://ojs.unifor.br/rca/article/view/14924. Acesso em: 19 ago. 2026.
