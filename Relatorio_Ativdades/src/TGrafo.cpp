@@ -1,8 +1,8 @@
 #include <iostream>
 #include "TGrafo.h"
 #include <fstream>
-#include <limits.h>
-#include <locale.h>
+#include <limits>
+
 
 /*
 - Andre Doerner Duarte - 10427938
@@ -10,20 +10,29 @@
 - Naoto Ushizaki - 10437445
 */
 
+// var static para infinito
+const float TGrafo::INF = std::numeric_limits<float>::infinity();
 // Construtor do TGrafo
 TGrafo::TGrafo( int n ){
     this->n = n;
     // No in�cio dos tempos n�o h� arestas
     this->m = 0; 
     // aloca da matriz do TGrafo
-    int **adjac = new int*[n];
+    float **adjac = new float*[n];
     for(int i = 0; i < n; i++)
-    	adjac[i]= new int[n];
+    	adjac[i] = new float[n];
     adj = adjac;
+    /*
     // Inicia a matriz com zeros
 	for(int i = 0; i< n; i++)
 		for(int j = 0; j< n; j++)
 			adj[i][j]=0;	
+    */
+
+    // Iniciar matriz com infinito:
+    for(int i = 0; i< n; i++)
+		for(int j = 0; j< n; j++)
+			adj[i][j] = INF;	
 }
 
 // Destructor, responsavel por
@@ -35,16 +44,16 @@ TGrafo::~TGrafo(){
     delete [] adj;
 	n = 0;
 	m = 0;
-	
+
 	std::cout << "espaco liberado" << std::endl;
 }
 
 // Insere uma aresta no Grafo tal que
 // v � adjacente a w
-void TGrafo::insereA(int v, int w){
+void TGrafo::insereA(int v, int w, float p){
     // testa se nao temos a aresta
-    if(adj[v][w] == 0 ){
-        adj[v][w] = 1;
+    if(adj[v][w] == INF ){
+        adj[v][w] = p;
         m++; // atualiza qtd arestas
     }
 }
@@ -52,8 +61,8 @@ void TGrafo::insereA(int v, int w){
 // remove uma aresta v->w do Grafo
 void TGrafo::removeA(int v, int w){
     // testa se temos a aresta
-    if(adj[v][w] == 1 ){
-        adj[v][w] = 0;
+    if(adj[v][w] != INF ){
+        adj[v][w] = INF;
         m--; // atualiza qtd arestas
     }
 }
@@ -65,7 +74,7 @@ int TGrafo::inDegree(int v){
         // verifica se "chega" 
         // um 't' que chega em 'v' (alvo):
         // (0,0), (1,0)...
-        if(adj[t][v] == 1)  
+        if(adj[t][v] != INF)  
             ingrau++;
     }
     return ingrau;
@@ -78,7 +87,7 @@ int TGrafo::outDegree(int v){
         // verifica se "sai" 
         // de 'v' e chega em 't' (alvo):
         // (0,0), (0,1), (0,2)...
-        if(adj[v][t] == 1)  
+        if(adj[v][t] != INF)  
             outgrau++;
     }
     return outgrau;
@@ -88,10 +97,10 @@ int TGrafo::outDegree(int v){
 int TGrafo::degree(int v){
     int grau_total = 0;
     for(int t = 0; t < n; t++){
-        if(adj[v][t] == 1)  
+        if(adj[v][t] != INF)  
             grau_total++;
 
-        if(adj[t][v] == 1)
+        if(adj[t][v] != INF)
             grau_total++;
     }
     return grau_total;
@@ -166,7 +175,7 @@ TGrafo_ND::~TGrafo_ND(){
     m = 0;
     std::cout << "espaco liberado (grafo nao-direcionado)" << std::endl;
 }
- 
+
 // EXERCICIO 7 - RELATORIO
 void TGrafo_ND::readfile(const char* grafo_example){
     std::ifstream file(grafo_example);
@@ -188,7 +197,6 @@ void TGrafo_ND::readfile(const char* grafo_example){
 }
  
 // ⚠️EXERCICIO 8 - RELATORIO
- 
 // Insere uma aresta no Grafo tal que v e adjacente a w (nos dois sentidos)
 void TGrafo_ND::NDinsereA(int v, int w){
     if(adj[v][w] == 0 && adj[w][v] == 0){
@@ -198,7 +206,6 @@ void TGrafo_ND::NDinsereA(int v, int w){
     }
 }
  
-
 void TGrafo_ND::NDremoveA(int v, int w){
     if(adj[v][w] == 1 && adj[w][v] == 1){
         adj[v][w] = 0;
@@ -219,7 +226,7 @@ int TGrafo_ND::degree(int v){
     }
     return grau_nd;
 }
- 
+// Funcao que mostra Grafo nao Direcionado
 void TGrafo_ND::NDshow(){
     std::cout << "n: " << n << std::endl;
     std::cout << "m: " << m << std::endl;
@@ -241,16 +248,19 @@ void TGrafo_ND::NDshow(){
     std::cout << "\nfim da impressao do grafo nao dirigido." << std::endl;
 }
 
+// Funcao que mostra Grafo Direcionado
 void TGrafo::show(){
     std::cout << "n: " << n << std::endl;
     std::cout << "m: " << m << std::endl;
     std::cout << "\n--GRAFO Direcionado--\n";
-    for( int i = 0; i < n; i++){
+    for(int i = 0; i < n; i++){
         std::cout << "\n";
-        for( int w=0; w < n; w++)
-            if(adj[i][w] == 1)
-                std::cout << "Adj[" << i<< "," << w << "]= 1" << " ";
-            else std::cout << "Adj[" << i<< "," << w << "]= 0" << " ";
+        for(int w = 0; w < n; w++){
+            std::cout << "Adj[" << i << "," << w << "]= ";
+            if(adj[i][w] == INF)
+                std::cout << "inf" << " ";  
+            else std::cout << adj[i][w] << " ";
+        }
     }
 
     std::cout << "\n";

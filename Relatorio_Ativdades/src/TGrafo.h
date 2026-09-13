@@ -20,10 +20,11 @@ class TGrafo{
 	private:
 		int n; // quantidade de v�rtices
 		int m; // quantidade de arestas
-		int **adj; //matriz de adjac�ncia
+		float **adj; //matriz de adjac�ncia
+		static const float INF;
 	public:
 		TGrafo( int n);
-		void insereA(int v, int w);
+		void insereA(int v, int w, float p);
 		void removeA(int v, int w);
 		void show();
 		int inDegree(int v);
@@ -32,7 +33,6 @@ class TGrafo{
 		bool Fonte_check(int v);
 		bool Sorvedouro(int v);
 		int isSymetric();
-		void isfloat(int v);
 		~TGrafo();		
 };	
 
