@@ -36,5 +36,20 @@ class TGrafo{
 		~TGrafo();		
 };	
 
+class TGrafo_ND{
+	private:
+		int n; // quantidade de v�rtices
+		int m; // quantidade de arestas
+		int **adj; //matriz de adjac�ncia
+	public:
+		TGrafo_ND( int n);
+		void NDinsereA(int v, int w);
+		void NDremoveA(int v, int w);
+		void readfile(const char* grafo_example);
+		int degree(int v);
+		void NDshow();
+		~TGrafo_ND();		
+};	
+
 #endif
 

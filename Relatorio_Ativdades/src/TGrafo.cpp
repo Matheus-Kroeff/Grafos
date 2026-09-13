@@ -26,13 +26,17 @@ TGrafo::TGrafo( int n ){
 			adj[i][j]=0;	
 }
 
-// Destructor, respons�vel por
-// liberar a mem�ria alocada para a matriz
+// Destructor, responsavel por
+// liberar a memoria alocada para a matriz
 TGrafo::~TGrafo(){
+    for(int del = 0; del < n; del++){
+        delete [] adj[del];
+    }
+    delete [] adj;
 	n = 0;
 	m = 0;
-	delete [] *adj;
-	std::cout << "espa�o liberado";
+	
+	std::cout << "espaco liberado" << std::endl;
 }
 
 // Insere uma aresta no Grafo tal que
@@ -96,17 +100,9 @@ int TGrafo::degree(int v){
 // ⚠️EXERCICIO 4 - RELATORIO
 bool TGrafo::Fonte_check(int v){
     // Calcula os ingrau e outgrau de novo
-    int outgrau = 0;
-    for(int t = 0; t < n; t++){
-        if(adj[v][t] == 1)  
-            outgrau++;
-    }
-
-    int ingrau = 0;
-    for(int t = 0; t < n; t++){
-        if(adj[t][v] == 1)  
-            ingrau++;
-    }
+    int outgrau = outDegree(v);
+    int ingrau = inDegree(v);
+    
     // Faz a verificacao por fonte:
     if (outgrau > 0 && ingrau == 0)
         return 1;
@@ -117,17 +113,8 @@ bool TGrafo::Fonte_check(int v){
 
 // ⚠️EXERCICIO 5 - RELATORIO
 bool TGrafo::Sorvedouro(int v){
-    int outgrau = 0;
-    for(int t = 0; t < n; t++){
-        if(adj[v][t] == 1)  
-            outgrau++;
-    }
-
-    int ingrau = 0;
-    for(int t = 0; t < n; t++){
-        if(adj[t][v] == 1)  
-            ingrau++;
-    }
+    int outgrau = outDegree(v);
+    int ingrau = inDegree(v);
     // Faz a verificacao por sorvedouro:
     if (outgrau == 0 && ingrau > 0)
         return 1;
@@ -147,13 +134,118 @@ int TGrafo::isSymetric(){
     return 1;
 }
 
-// Apresenta o Grafo contendo
-// n�mero de v�rtices, arestas
-// e a matriz de adjac�ncia obtida
+// ===========================================================
+// TGrafo_ND: grafo nao dirigido
+// ===========================================================
+ 
+// Construtor do TGrafo Non-Directed
+TGrafo_ND::TGrafo_ND(int n){
+    this->n = n;
+    this->m = 0;
+    int **adjac = new int*[n];
+    for(int i = 0; i < n; i++)
+        adjac[i] = new int[n];
+    adj = adjac;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            adj[i][j] = 0;
+        }
+    }
+}
+ 
+// Destructor, responsavel por
+// liberar a memoria alocada para a matriz
+TGrafo_ND::~TGrafo_ND(){
+    // mesma correcao aplicada ao TGrafo: antes tinha um
+    // "delete [] *adj;" extra depois deste laco (double free)
+    for(int i = 0; i < n; i++)
+        delete [] adj[i];
+    delete [] adj;
+ 
+    n = 0;
+    m = 0;
+    std::cout << "espaco liberado (grafo nao-direcionado)" << std::endl;
+}
+ 
+// EXERCICIO 7 - RELATORIO
+void TGrafo_ND::readfile(const char* grafo_example){
+    std::ifstream file(grafo_example);
+    if(!file.is_open()){
+        std::cout << "ERROR - Unable to access file" << std::endl;
+        return;
+    }
+    int V;
+    int A;
+    file >> V;
+    file >> A;
+ 
+    int a1, a2;
+    for(int y = 0; y < A; y++){
+        file >> a1 >> a2;
+        NDinsereA(a1, a2);
+    }
+    file.close();
+}
+ 
+// ⚠️EXERCICIO 8 - RELATORIO
+ 
+// Insere uma aresta no Grafo tal que v e adjacente a w (nos dois sentidos)
+void TGrafo_ND::NDinsereA(int v, int w){
+    if(adj[v][w] == 0 && adj[w][v] == 0){
+        adj[v][w] = 1;
+        adj[w][v] = 1;
+        m++;
+    }
+}
+ 
+
+void TGrafo_ND::NDremoveA(int v, int w){
+    if(adj[v][w] == 1 && adj[w][v] == 1){
+        adj[v][w] = 0;
+        adj[w][v] = 0;
+        m--;
+    }
+}
+ 
+// ⚠️EXERCICIO 9 - RELATORIO
+int TGrafo_ND::degree(int v){
+    // Em grafo nao direcionado, o grau e praticamente o
+    // numero de vizinhos conectados em v
+    int grau_nd = 0;
+    for(int b = 0; b < n; b++){
+        if(adj[v][b] == 1){
+            grau_nd++;
+        }
+    }
+    return grau_nd;
+}
+ 
+void TGrafo_ND::NDshow(){
+    std::cout << "n: " << n << std::endl;
+    std::cout << "m: " << m << std::endl;
+    std::cout << "\n--GRAFO Nao Direcionado--\n";
+    for(int i = 0; i < n; i++){
+        std::cout << "\n";
+        for(int w = 0; w < n; w++)
+            if(adj[i][w] == 1)
+                std::cout << "Adj[" << i << "," << w << "]= 1" << " ";
+            else
+                std::cout << "Adj[" << i << "," << w << "]= 0" << " ";
+    }
+    std::cout << "\n";
+    std::cout << "RESPOSTA 9)\n";
+    for(int index = 0; index < n; index++){
+        std::cout << "Grau do vertice " << index << ": " << degree(index) << std::endl;
+    }
+ 
+    std::cout << "\nfim da impressao do grafo nao dirigido." << std::endl;
+}
+
 void TGrafo::show(){
     std::cout << "n: " << n << std::endl;
     std::cout << "m: " << m << std::endl;
-    for( int i=0; i < n; i++){
+    std::cout << "\n--GRAFO Direcionado--\n";
+    for( int i = 0; i < n; i++){
         std::cout << "\n";
         for( int w=0; w < n; w++)
             if(adj[i][w] == 1)
@@ -162,7 +254,6 @@ void TGrafo::show(){
     }
 
     std::cout << "\n";
-    // Funções sobre Grau:
     // Resposta 1)
     std::cout << "\nRESPOSTA 1)\n";
     for(int index = 0; index < n; index++){
@@ -203,7 +294,7 @@ void TGrafo::show(){
     std::cout << "\nRESPOSTA 12)";
     // Resposta 13)
     
-    std::cout << "\nfim da impressao do grafo." << std::endl;
+    std::cout << "\nfim da impressao dos grafos." << std::endl;
 }
 
 

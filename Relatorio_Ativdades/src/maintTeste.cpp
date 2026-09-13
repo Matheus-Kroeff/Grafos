@@ -6,20 +6,26 @@
 
 #include "TGrafo.h"
 
+
 int main(){
-    //  chama o construtor para criar um grafo 4x4
+    
+    //---------------------------------------------//
+    // Cria e aloca os vertices e arestas para um Grafo Dirigido
     TGrafo g(4);
 
-    //insere as arestas do grafo
-    //A={(0,1),(0,2),(2,1),(2,3),(1,3)}
     g.insereA(0,1);
     g.insereA(0,2);
     g.insereA(2,1);
     g.insereA(2,3);
     g.insereA(1,3);
     //---------------------------------------------//
+    // Cria e aloca os vertices e arestas para um Grafo Não-Dirigido
+    TGrafo_ND g2(6);
+    
+    g2.readfile("grafo_example.txt");
 
     g.show();
+    g2.NDshow(); 
 
     return 0;
 }
