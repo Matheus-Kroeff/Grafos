@@ -6,21 +6,22 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <queue>
 #include <vector>
+#include <cmath>
 #include "graph_utils.h"
 
 // Constructor:
 graph_utils::graph_utils(int n){
-    this -> n = 0;
+    this -> n = n;
     this -> m = 0;
 
-    int **adjac = new int*[n];
-
-    for(int u = 0; u < n; u++){
-        adjac[u] = new int[n];
+    // Alocação da Matriz n x n
+    adj = new int*[n];
+    for(int u = 0; u < n; u++) {
+        adj[u] = new int[n];
     }
-    adj = adjac;
 
     // Preenchendo Matriz criada:
     for(int var1 = 0; var1 < n; var1++){
@@ -28,11 +29,13 @@ graph_utils::graph_utils(int n){
             adj[var1][var2] = 0;
         }
     }
-
+    // Alocação dos vetores auxiliares
     peso = new int[n];
+    rotulos = new std::string[n]; // Nome do Jogo
 
     for(int t = 0; t < n; t++){
         peso[t] = 0;
+        rotulos[t] = "Jogo " + std::to_string(t);
     }
 }
 
@@ -42,11 +45,14 @@ graph_utils::~graph_utils(){
         delete [] adj[v];
     }
 
-    delete [] *adj;
+    delete [] adj;
+    delete [] peso;
+    delete [] rotulos;
+    
     n = 0;
     m = 0;
 
-    std::cout << "Matrix deleted succesfully";
+    std::cout << "Matrix deleted succesfully;
 
 }
 
@@ -58,19 +64,50 @@ void graph_utils::readfile(const char *arquivo){
         std::cout << "ERROR - Unable to access file" << std::endl;
         return;
     }
-    int V;
-    int A;
-    file >> V;
-    file >> A;
+    int graphType, num V;
+    file >> graphType; // tipo de Grafo
+    file >> num V; // número de veértices
 
-    int arg1, arg2, peso;
+    this->n = numV;
+    this->m = 0;
 
-    for(int a = 0; a < A; a++){
-        file >> arg1 >> arg2 >> peso;
-        insertA(arg1, arg2);
+// Leitura dos Vértices: ID, Rótulo ("Nome do Jogo") e Peso do Vértice
+    for(int i = 0; i < n; i++) {
+        int id, pV;
+        std::string rotulo;
+        file >> id;
+
+        // Trata a leitura de nomes com espaços contidos entre aspas
+        std::string aux;
+        file >> aux;
+        if (aux.front() == '"') {
+            while (aux.back() != '"') {
+                std::string temp;
+                file >> temp;
+                aux += " " + temp;
+            }
+            rotulo = aux.substr(1, aux.size() - 2); // Remove as aspas
+        } else {
+            rotulo = aux;
+        }
+
+        file >> pV;
+        rotulos[id] = rotulo;
+        peso[id] = pV;
+    }
+
+    int numA;
+    file >> numA; // Leitura do número de Arestas
+
+    // Leitura das Arestas: Origem, Destino e Peso 
+    int u, v, pA;
+    for(int a = 0; a < numA; a++) {
+        file >> u >> v >> pA;
+        insertA(u, v, pA); // Passa o peso da aresta para a matriz
     }
 
     file.close();
+    std::cout << "Arquivo lido com sucesso!\n";
 
 }
 
