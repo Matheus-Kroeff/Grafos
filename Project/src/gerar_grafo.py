@@ -1,3 +1,9 @@
+"""
+- Andre Doerner Duarte - 10427938
+- Matheus Leonardo Cardoso Kroeff - 10426434
+- Naoto Ushizaki - 10437445
+"""
+
 import json
 import re
 import os
