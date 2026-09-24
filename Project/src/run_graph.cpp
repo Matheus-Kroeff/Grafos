@@ -42,6 +42,7 @@ int main() {
 
             case 2: // b) Gravar dados no arquivo
                 std::cout << "Opcao b: Gravando dados atualizados no arquivo " << arquivo << "...\n";
+                grafo.writefile(arquivo.c_str());
                 break;
 
             case 3: { // c) Inserir vértice (Sem pedir peso do vértice, pois o Tipo 6 tem peso só na aresta)
@@ -88,6 +89,7 @@ int main() {
 
             case 8: // h) Mostrar grafo
                 std::cout << "\n=== EXIBICAO DO GRAFO (MATRIZ) ===\n";
+                grafo.printGraph();
                 break;
 
             case 9: // i) Conexidade

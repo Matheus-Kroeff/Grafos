@@ -13,66 +13,91 @@
 #include "graph_utils.h"
 
 // Constructor:
-graph_utils::graph_utils(int n){
-    this -> n = n;
-    this -> m = 0;
+graph_utils::graph_utils(int n) {
+    this->n = n;
+    this->m = 0;
 
-    // Alocação da Matriz n x n
-    adj = new int*[n];
-    for(int u = 0; u < n; u++) {
-        adj[u] = new int[n];
-    }
-
-    // Preenchendo Matriz criada:
-    for(int var1 = 0; var1 < n; var1++){
-        for(int var2 = 0; var2 < n; var2++){
-            adj[var1][var2] = 0;
+    if (n > 0) {
+        adj = new int*[n];
+        for (int u = 0; u < n; u++) {
+            adj[u] = new int[n];
+            for (int v = 0; v < n; v++) {
+                adj[u][v] = 0;
+            }
         }
-    }
-    // Alocação dos vetores auxiliares
-    peso = new int[n];
-    rotulos = new std::string[n]; // Nome do Jogo
 
-    for(int t = 0; t < n; t++){
-        peso[t] = 0;
-        rotulos[t] = "Jogo " + std::to_string(t);
+        peso = new int[n];
+        rotulos = new std::string[n];
+
+        for (int t = 0; t < n; t++) {
+            peso[t] = 0;
+            rotulos[t] = "Jogo " + std::to_string(t);
+        }
+    } else {
+        adj = nullptr;
+        peso = nullptr;
+        rotulos = nullptr;
     }
 }
 
 // Deleter
-graph_utils::~graph_utils(){
-    for(int v = 0; v < n; v++){
-        delete [] adj[v];
+graph_utils::~graph_utils() {
+    if (adj != nullptr) {
+        for (int v = 0; v < n; v++) {
+            delete [] adj[v];
+        }
+        delete [] adj;
     }
 
-    delete [] adj;
-    delete [] peso;
-    delete [] rotulos;
-    
+    if (peso != nullptr) delete [] peso;
+    if (rotulos != nullptr) delete [] rotulos;
+
     n = 0;
     m = 0;
 
-    std::cout << "Matrix deleted succesfully\n";
-
+    std::cout << "Matrix deleted successfully\n";
 }
 
 // Reader - File opener
-void graph_utils::readfile(const char *arquivo){
+void graph_utils::readfile(const char *arquivo) {
     std::ifstream file(arquivo);
 
-    if(!file.is_open()){
-        std::cout << "ERROR - Unable to access file" << arquivo << std::endl;
+    if (!file.is_open()) {
+        std::cout << "ERROR - Unable to access file " << arquivo << std::endl;
         return;
     }
-    int graphType, numV;
-    file >> graphType; // tipo de Grafo
-    file >> numV; // número de veértices
 
+    // Libera a memória antiga existente (caso o grafo já tivesse dados)
+    if (n > 0 && adj != nullptr) {
+        for (int v = 0; v < n; v++) {
+            delete [] adj[v];
+        }
+        delete [] adj;
+        delete [] peso;
+        delete [] rotulos;
+    }
+
+    int graphType, numV;
+    file >> graphType; // Tipo do Grafo
+    file >> numV;      // Número de vértices lido do arquivo
+
+    // Atualiza os limites e aloca a memória necessária para os dados lidos
     this->n = numV;
     this->m = 0;
 
-// Leitura dos Vértices: ID, Rótulo ("Nome do Jogo") e Peso do Vértice
-    for(int i = 0; i < n; i++) {
+    adj = new int*[n];
+    for (int u = 0; u < n; u++) {
+        adj[u] = new int[n];
+        for (int v = 0; v < n; v++) {
+            adj[u][v] = 0; // Inicializa a matriz zerada
+        }
+    }
+
+    peso = new int[n];
+    rotulos = new std::string[n];
+
+    // Leitura dos Vértices: ID, Rótulo ("Nome do Jogo") e Peso do Vértice
+    for (int i = 0; i < n; i++) {
         int id, pV;
         std::string rotulo;
         file >> id;
@@ -92,23 +117,24 @@ void graph_utils::readfile(const char *arquivo){
         }
 
         file >> pV;
-        rotulos[id] = rotulo;
-        peso[id] = pV;
+        if (id >= 0 && id < n) {
+            rotulos[id] = rotulo;
+            peso[id] = pV;
+        }
     }
 
     int numA;
     file >> numA; // Leitura do número de Arestas
 
-    // Leitura das Arestas: Origem, Destino e Peso 
+    // 4. Leitura das Arestas: Origem, Destino e Peso
     int u, v, pA;
-    for(int a = 0; a < numA; a++) {
+    for (int a = 0; a < numA; a++) {
         file >> u >> v >> pA;
-        insertA(u, v, pA); // Passa o peso da aresta para a matriz
+        insertA(u, v, pA); // Grava o peso da aresta na matriz
     }
 
     file.close();
-    std::cout << "Arquivo lido com sucesso!\n";
-
+    std::cout << "Arquivo lido com sucesso! Vértices carregados: " << n << "\n";
 }
 
 // Insertion Vertice Method + Peso:
@@ -217,17 +243,103 @@ void graph_utils::removeA(int v, int w) {
 
 // Gravar dados no arquivo grafo.txt
 void graph_utils::writefile(const char *arquivo) {
-    
+    if (n == 0 || adj == nullptr) {
+        std::cout << "Grafo vazio na memoria. Nada para salvar.\n";
+        return;
+    }
+
+    std::ofstream file(arquivo);
+    if (!file.is_open()) {
+        std::cout << "ERRO: Nao foi possivel abrir o arquivo para gravacao.\n";
+        return;
+    }
+
+    // Tipo do grafo (6 - Orientado com peso na aresta)
+    file << "6\n";
+    file << n << "\n";
+
+    // Escreve os vértices: ID "Nome" Peso
+    for (int i = 0; i < n; i++) {
+        file << i << " \"" << rotulos[i] << "\" " << peso[i] << "\n";
+    }
+
+    // Escreve o número de arestas e as conexões
+    file << m << "\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (adj[i][j] > 0) {
+                file << i << " " << j << " " << adj[i][j] << "\n";
+            }
+        }
+    }
+
+    file.close();
+    std::cout << "Dados salvos com sucesso no arquivo " << arquivo << "!\n";
 }
 
 // Mostrar conteúdo do arquivo
 void graph_utils::showFileContent() {
-    
+    if (n == 0) {
+        std::cout << "O grafo esta vazio! Leia o arquivo primeiro (Opcao 1).\n";
+        return;
+    }
+
+    std::cout << "\n=======================================================\n";
+    std::cout << "              INFORMACOES DO GRAFO ATUAL               \n";
+    std::cout << "=======================================================\n";
+    std::cout << " Tipo do Grafo : 6 (Orientado com Peso nas Arestas)\n";
+    std::cout << " Total Vertices: " << n << "\n";
+    std::cout << " Total Arestas : " << m << "\n";
+    std::cout << "-------------------------------------------------------\n";
+    std::cout << " LISTA DE JOGOS (VERTICES):\n";
+    for (int i = 0; i < n; i++) {
+        std::cout << "   [ID " << i << "] " << rotulos[i] << "\n";
+    }
+    std::cout << "-------------------------------------------------------\n";
+    std::cout << " CONEXOES DE SIMILARIDADE (ARESTAS):\n";
+    bool temAresta = false;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (adj[i][j] > 0) {
+                std::cout << "   " << rotulos[i] << " ---> " << rotulos[j] 
+                          << " (Similaridade: " << adj[i][j] << "%)\n";
+                temAresta = true;
+            }
+        }
+    }
+    if (!temAresta) {
+        std::cout << "   Nenhuma aresta/conexao cadastrada.\n";
+    }
+    std::cout << "=======================================================\n";
 }
 
 // Mostrar grafo (Matriz de Adjacência)
 void graph_utils::printGraph() {
+    if (n == 0 || adj == nullptr) {
+        std::cout << "O grafo esta vazio! Leia o arquivo primeiro (Opcao 1).\n";
+        return;
+    }
 
+    std::cout << "\n=======================================================\n";
+    std::cout << "            MATRIZ DE ADJACENCIA DO GRAFO              \n";
+    std::cout << "=======================================================\n\n";
+
+    // Imprime os IDs das colunas no topo
+    std::cout << "      ";
+    for (int j = 0; j < n; j++) {
+        std::cout << "[" << j << "]\t";
+    }
+    std::cout << "\n";
+
+    // Imprime as linhas da matriz
+    for (int i = 0; i < n; i++) {
+        std::cout << "[" << i << "]\t";
+        for (int j = 0; j < n; j++) {
+            std::cout << adj[i][j] << "\t";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n=======================================================\n";
 }
 
 // Apresentar conexidade
@@ -235,3 +347,26 @@ void graph_utils::showConnectivity() {
 
 }
 
+// Recomendador de Jogos
+void graph_utils::recomendar(int v) {
+    if (v < 0 || v >= n) {
+        std::cout << "ID de jogo invalido!\n";
+        return;
+    }
+
+    std::cout << "\n=======================================================\n";
+    std::cout << " RECOMENDACOES PARA: " << rotulos[v] << "\n";
+    std::cout << "=======================================================\n";
+
+    bool encontrou = false;
+    for (int i = 0; i < n; i++) {
+        if (adj[v][i] > 0) {
+            std::cout << " -> " << rotulos[i] << " | Similaridade: " << adj[v][i] << "%\n";
+            encontrou = true;
+        }
+    }
+
+    if (!encontrou) {
+        std::cout << " Nenhuma conexao de similaridade encontrada para este jogo.\n";
+    }
+}

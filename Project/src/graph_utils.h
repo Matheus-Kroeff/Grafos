@@ -3,9 +3,6 @@
 - Matheus Leonardo Cardoso Kroeff - 10426434
 - Naoto Ushizaki - 10437445
 */
-#include <string>
-#include <vector>
-
 #ifndef GRAPH_UTILS_H
 #define GRAPH_UTILS_H
 
@@ -24,16 +21,21 @@ public:
     ~graph_utils();
 
     void readfile(const char *arquivo);
+    void writefile(const char *arquivo);
     void insertV(int pesoV, std::string nomeJogo = "");
     void removeV(int v);
     void insertA(int v, int w, int pAresta = 1);
     void removeA(int v, int w);
     
-    // Método para o recomendador de jogos
+    // Métodos de exibição e análise do menu
+    void showFileContent();
+    void printGraph();       // Sem o 'const' no final para bater com o .cpp
+    void showConnectivity();
+    
+    // Recomendador de jogos
     void recomendar(int v);
 
-    // Métodos auxiliares para exibição
-    void printGraph() const;
+    // Getters auxiliares
     int getNumV() const { return n; }
 };
 
