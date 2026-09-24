@@ -215,7 +215,7 @@ void graph_utils::removeA(int v, int w) {
     }
 }
 
-// Mostrar conteúdo do arquivo
+// Gravar dados no arquivo grafo.txt
 void graph_utils::writefile(const char *arquivo) {
     
 }
