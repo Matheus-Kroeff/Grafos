@@ -215,6 +215,23 @@ void graph_utils::removeA(int v, int w) {
     }
 }
 
+// Mostrar conteúdo do arquivo
+void graph_utils::writefile(const char *arquivo) {
+    
+}
 
+// Mostrar conteúdo do arquivo
+void graph_utils::showFileContent() {
+    
+}
 
+// Mostrar grafo (Matriz de Adjacência)
+void graph_utils::printGraph() {
+
+}
+
+// Apresentar conexidade
+void graph_utils::showConnectivity() { 
+
+}
 
