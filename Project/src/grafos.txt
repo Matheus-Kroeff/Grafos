@@ -3,9 +3,9 @@
 0 "The Witcher 3" 0
 1 "Cyberpunk 2077" 0
 2 "Skyrim" 0
-3 "GTA V" 0
-4
+3 "The Last of Us" 0
+5
 0 1 85
 0 2 90
+0 3 50
 1 0 85
-2 3 70

@@ -41,16 +41,15 @@ int main() {
                 break;
 
             case 2: // b) Gravar dados no arquivo
-                std::cout << "Opcao b: Gravando dados atualizados no arquivo " << arquivo << "...\n";
                 grafo.writefile(arquivo.c_str());
                 break;
 
-            case 3: { // c) Inserir vértice (Sem pedir peso do vértice, pois o Tipo 6 tem peso só na aresta)
+            case 3: { // c) Inserir vértice
                 std::string nome;
                 std::cout << "Digite o nome do novo jogo: ";
                 std::cin.ignore();
                 std::getline(std::cin, nome);
-                grafo.insertV(0, nome); // Peso 0 para o vértice
+                grafo.insertV(0, nome);
                 std::cout << "Jogo '" << nome << "' inserido no grafo!\n";
                 break;
             }
@@ -70,6 +69,7 @@ int main() {
                 std::cout << "Digite o ID do vertice/jogo a remover: ";
                 std::cin >> id;
                 grafo.removeV(id);
+                std::cout << "Vertice " << id << " removido do grafo.\n";
                 break;
             }
 
@@ -83,21 +83,18 @@ int main() {
             }
 
             case 7: // g) Mostrar conteúdo do arquivo
-                std::cout << "\n=== CONTEUDO DO GRAFO ===\n";
-                std::cout << "Total de Vertices (n): " << grafo.getNumV() << "\n";
+                grafo.showFileContent();
                 break;
 
             case 8: // h) Mostrar grafo
-                std::cout << "\n=== EXIBICAO DO GRAFO (MATRIZ) ===\n";
                 grafo.printGraph();
                 break;
 
             case 9: // i) Conexidade
-                std::cout << "\n=== CONEXIDADE DO GRAFO ===\n";
-                std::cout << "Grafo Orientado (Tipo 6). Verificando componentes fortemente conexas (FCONEX)...\n";
+                grafo.showConnectivity();
                 break;
 
-            case 10: { // Funcionalidade Principal de Recomendação
+            case 10: { // Funcionalidade Principal
                 int id;
                 std::cout << "Digite o ID do jogo escolhido (0 a " << grafo.getNumV() - 1 << "): ";
                 std::cin >> id;
@@ -105,7 +102,7 @@ int main() {
                 break;
             }
 
-            case 11: // j) Encerrar
+            case 11: // j) Encerrar a aplicação
                 std::cout << "Encerrando a aplicacao...\n";
                 break;
 

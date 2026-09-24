@@ -12,7 +12,7 @@
 #include <cmath>
 #include "graph_utils.h"
 
-// Constructor:
+// Construtor
 graph_utils::graph_utils(int n) {
     this->n = n;
     this->m = 0;
@@ -40,7 +40,7 @@ graph_utils::graph_utils(int n) {
     }
 }
 
-// Deleter
+// Destrutor
 graph_utils::~graph_utils() {
     if (adj != nullptr) {
         for (int v = 0; v < n; v++) {
@@ -58,7 +58,7 @@ graph_utils::~graph_utils() {
     std::cout << "Matrix deleted successfully\n";
 }
 
-// Reader - File opener
+// Opção a: Ler dados do arquivo grafo.txt
 void graph_utils::readfile(const char *arquivo) {
     std::ifstream file(arquivo);
 
@@ -67,7 +67,6 @@ void graph_utils::readfile(const char *arquivo) {
         return;
     }
 
-    // Libera a memória antiga existente (caso o grafo já tivesse dados)
     if (n > 0 && adj != nullptr) {
         for (int v = 0; v < n; v++) {
             delete [] adj[v];
@@ -78,10 +77,9 @@ void graph_utils::readfile(const char *arquivo) {
     }
 
     int graphType, numV;
-    file >> graphType; // Tipo do Grafo
-    file >> numV;      // Número de vértices lido do arquivo
+    file >> graphType;
+    file >> numV;
 
-    // Atualiza os limites e aloca a memória necessária para os dados lidos
     this->n = numV;
     this->m = 0;
 
@@ -89,20 +87,18 @@ void graph_utils::readfile(const char *arquivo) {
     for (int u = 0; u < n; u++) {
         adj[u] = new int[n];
         for (int v = 0; v < n; v++) {
-            adj[u][v] = 0; // Inicializa a matriz zerada
+            adj[u][v] = 0;
         }
     }
 
     peso = new int[n];
     rotulos = new std::string[n];
 
-    // Leitura dos Vértices: ID, Rótulo ("Nome do Jogo") e Peso do Vértice
     for (int i = 0; i < n; i++) {
         int id, pV;
         std::string rotulo;
         file >> id;
 
-        // Trata a leitura de nomes com espaços contidos entre aspas
         std::string aux;
         file >> aux;
         if (aux.front() == '"') {
@@ -111,7 +107,7 @@ void graph_utils::readfile(const char *arquivo) {
                 file >> temp;
                 aux += " " + temp;
             }
-            rotulo = aux.substr(1, aux.size() - 2); // Remove as aspas
+            rotulo = aux.substr(1, aux.size() - 2);
         } else {
             rotulo = aux;
         }
@@ -124,24 +120,55 @@ void graph_utils::readfile(const char *arquivo) {
     }
 
     int numA;
-    file >> numA; // Leitura do número de Arestas
+    file >> numA;
 
-    // 4. Leitura das Arestas: Origem, Destino e Peso
     int u, v, pA;
     for (int a = 0; a < numA; a++) {
         file >> u >> v >> pA;
-        insertA(u, v, pA); // Grava o peso da aresta na matriz
+        insertA(u, v, pA);
     }
 
     file.close();
-    std::cout << "Arquivo lido com sucesso! Vértices carregados: " << n << "\n";
+    std::cout << "Arquivo lido com sucesso! Vertices carregados: " << n << "\n";
 }
 
-// Insertion Vertice Method + Peso:
+// Opção b: Gravar dados no arquivo grafo.txt
+void graph_utils::writefile(const char *arquivo) {
+    if (n == 0 || adj == nullptr) {
+        std::cout << "Grafo vazio na memoria. Nada para salvar.\n";
+        return;
+    }
+
+    std::ofstream file(arquivo);
+    if (!file.is_open()) {
+        std::cout << "ERRO: Nao foi possivel abrir o arquivo para gravacao.\n";
+        return;
+    }
+
+    file << "6\n";
+    file << n << "\n";
+
+    for (int i = 0; i < n; i++) {
+        file << i << " \"" << rotulos[i] << "\" " << peso[i] << "\n";
+    }
+
+    file << m << "\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (adj[i][j] > 0) {
+                file << i << " " << j << " " << adj[i][j] << "\n";
+            }
+        }
+    }
+
+    file.close();
+    std::cout << "Dados salvos com sucesso no arquivo " << arquivo << "!\n";
+}
+
+// Opção c: Inserir vértice
 void graph_utils::insertV(int pesoV, std::string nomeJogo) {
-    int new_n = n + 1; // O novo tamanho tem de ser n + 1
+    int new_n = n + 1;
     
-    // Alocar nova matriz
     int **new_adj = new int*[new_n];
     for(int r = 0; r < new_n; r++) {
         new_adj[r] = new int[new_n];
@@ -150,7 +177,6 @@ void graph_utils::insertV(int pesoV, std::string nomeJogo) {
         }
     }
 
-    // Copiar valores antigos
     for(int r = 0; r < n; r++) {
         for(int t = 0; t < n; t++) {
             new_adj[r][t] = adj[r][t];
@@ -160,7 +186,6 @@ void graph_utils::insertV(int pesoV, std::string nomeJogo) {
     delete [] adj;
     adj = new_adj;
 
-    // Tratar vetores de pesos e rótulos
     int *new_peso = new int[new_n];
     std::string *new_rotulos = new std::string[new_n];
 
@@ -177,10 +202,18 @@ void graph_utils::insertV(int pesoV, std::string nomeJogo) {
     peso = new_peso;
     rotulos = new_rotulos;
 
-    n = new_n; // Atualiza a quantidade total de vértices
+    n = new_n;
 }
 
-// Remover vertice + encolhe matriz (atualiza ele) + diminuir peso + reindexar vertice:
+// Opção d: Inserir aresta
+void graph_utils::insertA(int v, int w, int pAresta) {
+    if(v >= 0 && v < n && w >= 0 && w < n) {
+        if(adj[v][w] == 0) m++;
+        adj[v][w] = pAresta;
+    }
+}
+
+// Opção e: Remover vértice
 void graph_utils::removeV(int v) {
     if(v < 0 || v >= n) return;
 
@@ -193,7 +226,7 @@ void graph_utils::removeV(int v) {
 
     int new_linha = 0;
     for(int a = 0; a < n; a++) {
-        if(a == v) continue; // Pula o vértice removido
+        if(a == v) continue;
 
         new_adj[new_linha] = new int[new_n];
         int new_column = 0;
@@ -207,7 +240,6 @@ void graph_utils::removeV(int v) {
         new_linha++;
     }
 
-    // Liberta a memória antiga
     for(int y = 0; y < n; y++) {
         delete [] adj[y];
     }
@@ -215,23 +247,13 @@ void graph_utils::removeV(int v) {
     delete [] peso;
     delete [] rotulos;
 
-    // Atualiza com os novos vetores
     adj = new_adj;
     peso = new_p;
     rotulos = new_r;
     n = new_n;
 }
 
-
-// Insertion Aresta Method:
-void graph_utils::insertA(int v, int w, int pAresta) {
-    if(v >= 0 && v < n && w >= 0 && w < n) {
-        if(adj[v][w] == 0) m++;
-        adj[v][w] = pAresta; // Grava o peso diretamente
-    }
-}
-
-// Remocao Aresta:
+// Opção f: Remover aresta
 void graph_utils::removeA(int v, int w) {
     if(v >= 0 && v < n && w >= 0 && w < n) {
         if(adj[v][w] != 0) {
@@ -241,43 +263,7 @@ void graph_utils::removeA(int v, int w) {
     }
 }
 
-// Gravar dados no arquivo grafo.txt
-void graph_utils::writefile(const char *arquivo) {
-    if (n == 0 || adj == nullptr) {
-        std::cout << "Grafo vazio na memoria. Nada para salvar.\n";
-        return;
-    }
-
-    std::ofstream file(arquivo);
-    if (!file.is_open()) {
-        std::cout << "ERRO: Nao foi possivel abrir o arquivo para gravacao.\n";
-        return;
-    }
-
-    // Tipo do grafo (6 - Orientado com peso na aresta)
-    file << "6\n";
-    file << n << "\n";
-
-    // Escreve os vértices: ID "Nome" Peso
-    for (int i = 0; i < n; i++) {
-        file << i << " \"" << rotulos[i] << "\" " << peso[i] << "\n";
-    }
-
-    // Escreve o número de arestas e as conexões
-    file << m << "\n";
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (adj[i][j] > 0) {
-                file << i << " " << j << " " << adj[i][j] << "\n";
-            }
-        }
-    }
-
-    file.close();
-    std::cout << "Dados salvos com sucesso no arquivo " << arquivo << "!\n";
-}
-
-// Mostrar conteúdo do arquivo
+// Opção g: Mostrar conteúdo do arquivo
 void graph_utils::showFileContent() {
     if (n == 0) {
         std::cout << "O grafo esta vazio! Leia o arquivo primeiro (Opcao 1).\n";
@@ -313,7 +299,7 @@ void graph_utils::showFileContent() {
     std::cout << "=======================================================\n";
 }
 
-// Mostrar grafo (Matriz de Adjacência)
+// Opção h: Mostrar grafo (Matriz de Adjacência)
 void graph_utils::printGraph() {
     if (n == 0 || adj == nullptr) {
         std::cout << "O grafo esta vazio! Leia o arquivo primeiro (Opcao 1).\n";
@@ -324,14 +310,12 @@ void graph_utils::printGraph() {
     std::cout << "            MATRIZ DE ADJACENCIA DO GRAFO              \n";
     std::cout << "=======================================================\n\n";
 
-    // Imprime os IDs das colunas no topo
     std::cout << "      ";
     for (int j = 0; j < n; j++) {
         std::cout << "[" << j << "]\t";
     }
     std::cout << "\n";
 
-    // Imprime as linhas da matriz
     for (int i = 0; i < n; i++) {
         std::cout << "[" << i << "]\t";
         for (int j = 0; j < n; j++) {
@@ -342,12 +326,12 @@ void graph_utils::printGraph() {
     std::cout << "\n=======================================================\n";
 }
 
-// Apresentar conexidade
-void graph_utils::showConnectivity() { 
-
+// Opção i: Apresentar a conexidade do grafo e o reduzido
+void graph_utils::showConnectivity() {
+   
 }
 
-// Recomendador de Jogos
+// Funcionalidade Principal: Recomendador de Jogos
 void graph_utils::recomendar(int v) {
     if (v < 0 || v >= n) {
         std::cout << "ID de jogo invalido!\n";

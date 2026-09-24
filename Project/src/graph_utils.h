@@ -3,6 +3,7 @@
 - Matheus Leonardo Cardoso Kroeff - 10426434
 - Naoto Ushizaki - 10437445
 */
+
 #ifndef GRAPH_UTILS_H
 #define GRAPH_UTILS_H
 
@@ -20,23 +21,39 @@ public:
     graph_utils(int n);
     ~graph_utils();
 
+    // Opção a: Ler dados do arquivo
     void readfile(const char *arquivo);
+
+    // Opção b: Gravar dados no arquivo
     void writefile(const char *arquivo);
+
+    // Opção c: Inserir vértice
     void insertV(int pesoV, std::string nomeJogo = "");
-    void removeV(int v);
+
+    // Opção d: Inserir aresta
     void insertA(int v, int w, int pAresta = 1);
+
+    // Opção e: Remover vértice
+    void removeV(int v);
+
+    // Opção f: Remover aresta
     void removeA(int v, int w);
-    
-    // Métodos de exibição e análise do menu
+
+    // Opção g: Mostrar conteúdo do arquivo
     void showFileContent();
-    void printGraph();       // Sem o 'const' no final para bater com o .cpp
+
+    // Opção h: Mostrar grafo
+    void printGraph();
+
+    // Opção i: Apresentar conexidade
     void showConnectivity();
-    
-    // Recomendador de jogos
+
+    // Funcionalidade Principal do Projeto
     void recomendar(int v);
 
     // Getters auxiliares
     int getNumV() const { return n; }
+    int getNumA() const { return m; }
 };
 
 #endif
