@@ -52,7 +52,7 @@ graph_utils::~graph_utils(){
     n = 0;
     m = 0;
 
-    std::cout << "Matrix deleted succesfully;
+    std::cout << "Matrix deleted succesfully\n";
 
 }
 
@@ -61,12 +61,12 @@ void graph_utils::readfile(const char *arquivo){
     std::ifstream file(arquivo);
 
     if(!file.is_open()){
-        std::cout << "ERROR - Unable to access file" << std::endl;
+        std::cout << "ERROR - Unable to access file" << arquivo << std::endl;
         return;
     }
-    int graphType, num V;
+    int graphType, numV;
     file >> graphType; // tipo de Grafo
-    file >> num V; // número de veértices
+    file >> numV; // número de veértices
 
     this->n = numV;
     this->m = 0;
@@ -112,116 +112,108 @@ void graph_utils::readfile(const char *arquivo){
 }
 
 // Insertion Vertice Method + Peso:
-void graph_utils::insertV(int pesoV){
-    int new_n = 0;
-    // Criar array novo size n + 1 ao add mais vertices
+void graph_utils::insertV(int pesoV, std::string nomeJogo) {
+    int new_n = n + 1; // O novo tamanho tem de ser n + 1
+    
+    // Alocar nova matriz
     int **new_adj = new int*[new_n];
-    for(int r = 0; r < n; r++){
+    for(int r = 0; r < new_n; r++) {
         new_adj[r] = new int[new_n];
-        for(int t = 0; t < n; t++){
-            new_adj[r][t] = adj[r][t];
+        for(int c = 0; c < new_n; c++) {
+            new_adj[r][c] = 0;
         }
-        new_adj[r][n] = 0; // novos vertices -> (0,4)(1,4)(r++,n)
-        delete [] adj[r]; // liberar linha antiga 
-    }
-    new_adj[n] = new int[new_n];
-    for(int u = 0; u < new_n; u++){
-        new_adj[n][u] = 0;
     }
 
+    // Copiar valores antigos
+    for(int r = 0; r < n; r++) {
+        for(int t = 0; t < n; t++) {
+            new_adj[r][t] = adj[r][t];
+        }
+        delete [] adj[r];
+    }
     delete [] adj;
     adj = new_adj;
 
-    //Tratar pesos -> inserindo no novo array de pesos
+    // Tratar vetores de pesos e rótulos
     int *new_peso = new int[new_n];
-    for(int k = 0; k < new_n; k++){
-        new_peso[k] = peso[k];
-    }
-    new_peso[n] = pesoV; // pega proximo peso
-    delete [] peso;
-    peso = new_peso;
+    std::string *new_rotulos = new std::string[new_n];
 
-    n = new_n; // update quantidade 
+    for(int k = 0; k < n; k++) {
+        new_peso[k] = peso[k];
+        new_rotulos[k] = rotulos[k];
+    }
+    new_peso[n] = pesoV;
+    new_rotulos[n] = nomeJogo.empty() ? ("Jogo " + std::to_string(n)) : nomeJogo;
+
+    delete [] peso;
+    delete [] rotulos;
+
+    peso = new_peso;
+    rotulos = new_rotulos;
+
+    n = new_n; // Atualiza a quantidade total de vértices
 }
 
 // Remover vertice + encolhe matriz (atualiza ele) + diminuir peso + reindexar vertice:
-void graph_utils::removeV(int v){
+void graph_utils::removeV(int v) {
     if(v < 0 || v >= n) return;
 
-    // Ja atualiza arestas + quant de vertices:
-    m -= degree(v);
     int new_n = n - 1;
+    if(new_n <= 0) return;
 
-    // Criando matriz + vetor novos vazios (para tratar a remocao + atualizacao geral)
-    int **new_adj = nullptr; // matriz
-    int *new_p = nullptr; // peso
+    int **new_adj = new int*[new_n];
+    int *new_p = new int[new_n];
+    std::string *new_r = new std::string[new_n];
 
-    if(new_n > 0){
-        new_adj = new int*[new_n];
-        new_p = new int[new_n];
+    int new_linha = 0;
+    for(int a = 0; a < n; a++) {
+        if(a == v) continue; // Pula o vértice removido
 
-        int new_linha = 0;  // linha da nova matriz
-        for(int a = 0; a < n; a++){
-            if(a == v)
-                continue; // pulando linha do vertice removido
-        
-
-        // Aqui atualiza-se a matrix:
-            new_adj[new_linha] = new int[new_n];
-            int new_collumn = 0;
-            for(int b = 0; b < n; b++){
-                if(b == v)
-                    continue;
-                new_adj[new_linha][new_collumn] = adj[a][b]; //copia os valores antigos -> nova matrix
-                new_collumn++; 
-            }
-            new_p[new_n] = peso[a];
-            new_linha++;
+        new_adj[new_linha] = new int[new_n];
+        int new_column = 0;
+        for(int b = 0; b < n; b++) {
+            if(b == v) continue;
+            new_adj[new_linha][new_column] = adj[a][b];
+            new_column++;
         }
-
-        for(int y = 0; y < n; y++){
-            delete [] adj[y];
-        }  
-        // liberando arrays
-        delete [] adj;
-        delete [] peso;
-
-        // update para estrutura nova + quant de vertices (n)
-        adj = new_adj;
-        peso = new_p;
-        n = new_n;
+        new_p[new_linha] = peso[a];
+        new_r[new_linha] = rotulos[a];
+        new_linha++;
     }
 
+    // Liberta a memória antiga
+    for(int y = 0; y < n; y++) {
+        delete [] adj[y];
+    }
+    delete [] adj;
+    delete [] peso;
+    delete [] rotulos;
+
+    // Atualiza com os novos vetores
+    adj = new_adj;
+    peso = new_p;
+    rotulos = new_r;
+    n = new_n;
 }
 
 
 // Insertion Aresta Method:
-void graph_utils::insertA(int v, int w){
-    if(adj[v][w] == 0 && adj[w][v] == 0){
-        adj[v][w] = 1;
-        adj[w][v] = 1;
-        m++;
+void graph_utils::insertA(int v, int w, int pAresta) {
+    if(v >= 0 && v < n && w >= 0 && w < n) {
+        if(adj[v][w] == 0) m++;
+        adj[v][w] = pAresta; // Grava o peso diretamente
     }
 }
 
 // Remocao Aresta:
-void graph_utils::removeA(int v, int w){
-    if(adj[v][w] == 1 && adj[w][v] == 1){
-        adj[v][w] = 0;
-        adj[w][v] = 0;
-        m--;
+void graph_utils::removeA(int v, int w) {
+    if(v >= 0 && v < n && w >= 0 && w < n) {
+        if(adj[v][w] != 0) {
+            adj[v][w] = 0;
+            m--;
+        }
     }
 }
-
-// Remocao Vertice:
-void graph_utils::removeA(int v, int w){
-    if(adj[v][w] == 1 && adj[w][v] == 1){
-        adj[v][w] = 0;
-        adj[w][v] = 0;
-        m--;
-    }
-}
-// 
 
 
 
