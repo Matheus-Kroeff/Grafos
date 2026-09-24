@@ -6,40 +6,35 @@
 #include <string>
 #include <vector>
 
-#ifndef ___GRAFO_MATRIZ_ADJACENCIA___
+#ifndef GRAPH_UTILS_H
+#define GRAPH_UTILS_H
 
-#define ___GRAFO_MATRIZ_ADJACENCIA___
+#include <string>
 
+class graph_utils {
+private:
+    int n;                 // Número de vértices
+    int m;                 // Número de arestas
+    int **adj;             // Matriz de adjacência
+    int *peso;             // Vetor de pesos dos vértices
+    std::string *rotulos;  // Vetor com os nomes dos jogos
 
-class graph_utils{
-	private:
-		int n; // quantidade de vertices
-		int m; // quantidade de arestas
-		int **adj; //matriz de adjacencia
-		int *peso;
-	public:
-		// Construct
-		graph_utils( int n);
+public:
+    graph_utils(int n);
+    ~graph_utils();
 
-		// File Methods
-		void readfile(const char*arquivo);
-		void writefile(const char* arquivo);
-		void show_file(const char* arquivo);
+    void readfile(const char *arquivo);
+    void insertV(int pesoV, std::string nomeJogo = "");
+    void removeV(int v);
+    void insertA(int v, int w, int pAresta = 1);
+    void removeA(int v, int w);
+    
+    // Método para o recomendador de jogos
+    void recomendar(int v);
 
-		// Methods general:
-		void insertA(int v, int w);
-		void insertV(int pv);
-		void removeA(int v, int w);
-		void removeV(int v);
-		void setPeso(int v, int p);
-		int getpeso(int p);
-		
-		void show();
-		int degree(int v);
-		void conex();
-		int getN();
-		~graph_utils();		
-};	
+    // Métodos auxiliares para exibição
+    void printGraph() const;
+    int getNumV() const { return n; }
+};
 
 #endif
-
