@@ -1,36 +1,61 @@
-import pandas as pd
+import json
+import re
+import os
 
-def gerar_grafo_steam(csv_path="steam_games.csv", output_path="grafos.txt", max_jogos=85, min_similaridade=20):
-    print("A carregar o ficheiro CSV da Steam...")
+def gerar_grafo_steam_json(json_path="games.json", output_path="grafos.txt", min_similaridade=15):
+    print(f"Lendo o arquivo JSON '{json_path}'...")
     
-    # 1. Leitura do dataset
-    try:
-        df = pd.read_csv(csv_path)
-    except FileNotFoundError:
-        print(f"ERRO: Ficheiro '{csv_path}' nao encontrado na pasta!")
+    if not os.path.exists(json_path):
+        print(f"ERRO: Arquivo '{json_path}' nao encontrado na pasta!")
         return
 
-    # Trata colunas nulas e seleciona apenas os primeiros 'max_jogos'
-    df = df.dropna(subset=['Name', 'Genres']) if 'Genres' in df.columns else df.dropna(subset=['Name'])
-    df = df.head(max_jogos).reset_index(drop=True)
+    # 1. Leitura do JSON com tratamento para vírgulas sobressalentes
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            conteudo_raw = f.read()
 
-    num_vertices = len(df)
+        # Limpa eventuais vírgulas sobressalentes antes do fecho de chaves/colchetes
+        conteudo_limpo = re.sub(r',\s*([\}\]])', r'\1', conteudo_raw)
+        dados = json.loads(conteudo_limpo)
+        
+    except Exception as e:
+        print(f"ERRO ao ler o arquivo JSON: {e}")
+        return
+
     vertices = []
     
-    # 2. Mapeamento dos Vértices (ID, Rótulo/Nome, Peso do Vértice)
-    for idx, row in df.iterrows():
-        nome_jogo = str(row['Name']).replace('"', '') # Remove aspas internas para nao quebrar o C++
-        # Trata generos/tags como um conjunto de palavras para o calculo
-        tags = set(str(row.get('Genres', '')).split(',')) | set(str(row.get('Categories', '')).split(','))
+    # 2. Mapeamento dos Vértices (ID, Nome/Rótulo, Peso)
+    for idx, (app_id, jogo) in enumerate(dados.items()):
+        if not isinstance(jogo, dict):
+            continue
+
+        nome_bruto = str(jogo.get('name', f"Jogo {idx}"))
+        nome_limpo = nome_bruto.replace('"', '').replace('\n', '').replace('\r', '').strip()
+
+        tags_set = set()
         
+        # Lê tags
+        tags_obj = jogo.get('tags', {})
+        if isinstance(tags_obj, dict):
+            tags_set.update([t.strip().lower() for t in tags_obj.keys()])
+        elif isinstance(tags_obj, list):
+            tags_set.update([str(t).strip().lower() for t in tags_obj])
+
+        # Lê géneros
+        genres_obj = jogo.get('genres', [])
+        if isinstance(genres_obj, list):
+            tags_set.update([str(g).strip().lower() for g in genres_obj])
+
         vertices.append({
-            'id': idx,
-            'nome': nome_jogo,
-            'peso': 0, # Peso do vértice é 0 no Grafo Tipo 6
-            'tags': {t.strip().lower() for t in tags if t.strip()}
+            'id': len(vertices),
+            'nome': nome_limpo,
+            'peso': 0, # Peso 0 no Grafo Tipo 6
+            'tags': tags_set
         })
 
-    # 3. Cálculo das Arestas (Índice de Jaccard)
+    num_vertices = len(vertices)
+
+    # 3. Cálculo das Arestas (Similaridade de Jaccard)
     arestas = []
     for i in range(num_vertices):
         for j in range(num_vertices):
@@ -43,35 +68,27 @@ def gerar_grafo_steam(csv_path="steam_games.csv", output_path="grafos.txt", max_
             uniao = len(set_i.union(set_j))
             if uniao > 0:
                 intersecao = len(set_i.intersection(set_j))
-                # Similaridade de Jaccard normalizada entre 0 e 100
                 similaridade = int((intersecao / uniao) * 100)
                 
-                # Regra de corte para nao poluir a matriz com ligacoes fracas
+                # Guarda aresta se atingir a nota de corte
                 if similaridade >= min_similaridade:
                     arestas.append((i, j, similaridade))
 
-    # 4. Escrita do ficheiro grafos.txt conforme o padrão exigido
-    print(f"A exportar para '{output_path}'...")
+    # 4. Escrita do arquivo grafos.txt para C++
+    print(f"Exportando para '{output_path}'...")
     with open(output_path, 'w', encoding='utf-8') as f:
-        # Linha 1: Tipo de Grafo (6 = Orientado com Peso na Aresta)
-        f.write("6\n")
-        
-        # Linha 2: Numero total de Vertices
+        f.write("6\n") # Tipo do Grafo
         f.write(f"{num_vertices}\n")
         
-        # Seção de Vértices: ID "Nome_do_Jogo" Peso_Vertice
         for v in vertices:
             f.write(f'{v["id"]} "{v["nome"]}" {v["peso"]}\n')
             
-        # Numero total de Arestas
         f.write(f"{len(arestas)}\n")
         
-        # Seção de Arestas: ID_Origem ID_Destino Peso_Aresta
         for u, v, peso_aresta in arestas:
             f.write(f"{u} {v} {peso_aresta}\n")
 
-    print(f"Concluido com sucesso! {num_vertices} vertices e {len(arestas)} arestas geradas.")
+    print(f"Sucesso! Gerados {num_vertices} vertices e {len(arestas)} arestas no '{output_path}'.")
 
 if __name__ == "__main__":
-    # Garanta que o ficheiro CSV do Steam esteja na mesma pasta com o nome 'steam_games.csv'
-    gerar_grafo_steam()
+    gerar_grafo_steam_json()
