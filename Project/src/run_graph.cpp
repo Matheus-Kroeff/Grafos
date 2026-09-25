@@ -8,6 +8,16 @@
 #include <string>
 #include "graph_utils.h"
 
+std::string conexidadeParaTexto(graph_utils::Connexity c){
+    switch(c){
+        case graph_utils::C0: return "Desconexo";
+        case graph_utils::C1: return "Fracamente conexo";
+        case graph_utils::C2: return "Unilateralmente conexo";
+        case graph_utils::C3: return "Fortemente conexo";
+        default: return "Desconhecido";
+    }
+}
+
 int main() {
     graph_utils grafo(0);
     int opcao = 0;
@@ -90,10 +100,28 @@ int main() {
                 grafo.printGraph();
                 break;
 
-            case 9: // i) Conexidade
-                grafo.showConnectivity();
-                break;
+            case 9: {// i) Conexidade 
+                int** reduzida;
+                int quant_areas;
+                graph_utils::Connexity resultado = grafo.showConnectivity(reduzida, quant_areas);
+                
+                std::cout << "Categoria: C" << resultado << " (" << conexidadeParaTexto(resultado) << ")" << std::endl;
+                std::cout << "\nGrafo Reduzido: " << quant_areas << "areas:" << std::endl;
+                
+                for(int i = 0; i < quant_areas; i++){
+                    for(int j = 0; j < quant_areas; j++){
+                        std::cout << reduzida[i][j] << " ";
+                    }
+                    std::cout << std::endl;
+                }
 
+                // libera a memoria da matriz reduzida
+                for(int i = 0; i < quant_areas; i++)
+                    delete[] reduzida[i];
+                delete[] reduzida;
+
+                break;
+            }
             case 10: { // Funcionalidade Principal
                 int id;
                 std::cout << "Digite o ID do jogo escolhido (0 a " << grafo.getNumV() - 1 << "): ";
