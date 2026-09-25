@@ -4,6 +4,20 @@
 - Naoto Ushizaki - 10437445
 """
 
+"""
+SÍNTESE DO ARQUIVO:
+Este script Python realiza a leitura e o pré-processamento do arquivo 'games.json' 
+para construir a estrutura de dados do grafo de recomendação de jogos.
+
+O script calcula o peso das arestas através da Similaridade de Jaccard entre cada par 
+de jogos, dividindo a interseção (características, gêneros e tags em comum) pela 
+união (total de características únicas dos dois jogos combinados). 
+
+Os resultados que atingem o limite mínimo de similaridade (15%) são exportados para o 
+arquivo 'grafos.txt', contendo o tipo de grafo (Tipo 6: Orientado e Ponderado), a 
+lista de vértices (IDs e nomes dos jogos) e a lista de arestas ponderadas.
+"""
+
 import json
 import re
 import os
@@ -15,7 +29,7 @@ def gerar_grafo_steam_json(json_path="games.json", output_path="grafos.txt", min
         print(f"ERRO: Arquivo '{json_path}' nao encontrado na pasta!")
         return
 
-    # 1. Leitura do JSON com tratamento para vírgulas sobressalentes
+    # Leitura do JSON com tratamento para vírgulas sobressalentes
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             conteudo_raw = f.read()
@@ -30,7 +44,7 @@ def gerar_grafo_steam_json(json_path="games.json", output_path="grafos.txt", min
 
     vertices = []
     
-    # 2. Mapeamento dos Vértices (ID, Nome/Rótulo, Peso)
+    # Mapeamento dos Vértices (ID, Nome/Rótulo, Peso)
     for idx, (app_id, jogo) in enumerate(dados.items()):
         if not isinstance(jogo, dict):
             continue
@@ -40,14 +54,14 @@ def gerar_grafo_steam_json(json_path="games.json", output_path="grafos.txt", min
 
         tags_set = set()
         
-        # Lê tags
+        # Leitura das tags
         tags_obj = jogo.get('tags', {})
         if isinstance(tags_obj, dict):
             tags_set.update([t.strip().lower() for t in tags_obj.keys()])
         elif isinstance(tags_obj, list):
             tags_set.update([str(t).strip().lower() for t in tags_obj])
 
-        # Lê géneros
+        # Leitura dos generos
         genres_obj = jogo.get('genres', [])
         if isinstance(genres_obj, list):
             tags_set.update([str(g).strip().lower() for g in genres_obj])
@@ -61,12 +75,12 @@ def gerar_grafo_steam_json(json_path="games.json", output_path="grafos.txt", min
 
     num_vertices = len(vertices)
 
-    # 3. Cálculo das Arestas (Similaridade de Jaccard)
+    # Cálculo das Arestas (Similaridade de Jaccard)
     arestas = []
     for i in range(num_vertices):
         for j in range(num_vertices):
             if i == j:
-                continue # Evita auto-laços
+                continue 
             
             set_i = vertices[i]['tags']
             set_j = vertices[j]['tags']
@@ -80,7 +94,7 @@ def gerar_grafo_steam_json(json_path="games.json", output_path="grafos.txt", min
                 if similaridade >= min_similaridade:
                     arestas.append((i, j, similaridade))
 
-    # 4. Escrita do arquivo grafos.txt para C++
+    # Escrita do arquivo grafos.txt para C++
     print(f"Exportando para '{output_path}'...")
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write("6\n") # Tipo do Grafo
