@@ -326,9 +326,134 @@ void graph_utils::printGraph() {
     std::cout << "\n=======================================================\n";
 }
 
+// ATENCAO -> IMPRIMINDO GRAFO REDUZIDO ESTRANHO
 // Opção i: Apresentar a conexidade do grafo e o reduzido
-void graph_utils::showConnectivity() {
-   
+ graph_utils::Connexity graph_utils::showConnectivity(int** &reduzida, int &quant_areas) {
+    
+    bool** reach = new bool*[n];
+    // iniciar tudo com false:
+    for(int u = 0; u < n; u++){
+        reach[u] = new bool[n]();
+
+        int* line = new int[n];
+        int start = 0;
+        int end = 0;
+        line[end++] = u;
+        reach[u][u] = true;
+
+        while(start < end){
+            int pointer = line[start++];
+
+            for(int next = 0; next < n; next++){
+                if(adj[pointer][next] != 0 && !reach[u][next]){
+                    reach[u][next] = true; 
+                    line[end++] = next; // move pro proximo vertice
+                }
+            }
+        }
+        delete[] line;
+    }
+
+    // Montando Grafo reduzido:
+    int* areas = new int[n];
+    for(int idx = 0; idx < n; idx++){
+        areas[idx] = -1;
+    }
+
+    int atual = 0;
+    for(int var = 0; var < n; var++){
+        // colocando os vertices que sao fortemente conexos na lista 'areas':
+        if(areas[var] == -1){
+            areas[var] = atual;
+            for(int c = var + 1; c < n; c++){
+                // verifica se é alcancavel
+                if(reach[var][c] && reach[c][var]){
+                    areas[c] = atual;
+                }
+            }
+            atual++;
+        }
+    }
+    quant_areas = atual;    
+
+    reduzida = new int*[quant_areas];
+    for(int p = 0; p < quant_areas; p++){
+        reduzida[p] = new int [quant_areas]();
+    }
+    for(int a = 0; a < n; a++){
+        for(int b = 0; b < n; b++){
+            if(adj[a][b] != 0 && areas[a] != areas[b]){
+                reduzida[areas[a]][areas[b]] = 1; 
+            }
+        }
+    }
+    delete[] areas;
+
+    // Checar fortemente conexo:
+    bool C3true = true;
+    for(int x = 0; x < this->n; x++){
+        for(int y = 0; y < this->n; y++){
+            // Checa se pegaram vertices diferentes e verifica se ligaçao 
+            // entre essas arestas existe sentido de ida e volta;
+            if (x != y && !(reach[x][y] == reach[y][x])){
+                C3true = false;
+            }
+        }
+    }
+    if(C3true){
+        for(int d = 0; d < n; d++){
+            delete[] reach[d];
+        }
+        delete[] reach;
+        return C3;
+    }
+    
+     bool C2true = true;
+    for(int x = 0; x < this->n; x++){
+        for(int y = 0; y < this->n; y++){
+            // Verifica se existe um caminho para ir até certa
+            // aresta ou um de volta. Mas nao ambos simultaneamente.
+            if (x != y && !(reach[x][y] || reach[y][x])){
+                C2true = false;
+            }
+        }
+    }
+    if(C2true){
+        for(int d = 0; d < n; d++){
+            delete[] reach[d];
+        }
+        delete[] reach;
+        return C2;
+    }
+
+    // Tratando C1: Ignorando direcao ->  
+    // Criacao de variaveis para percorrer de novo o grafo
+    bool* list_vertices_passados = new bool[n]();
+    int* line = new int[n];
+    int start = 0, end = 0;
+    list_vertices_passados[0] = true;
+    line[end++] = 0;
+
+    while(start < end){
+        int pointer = line[start++];
+
+        for(int next = 0; next < n; next++){
+            if((adj[pointer][next] != 0 || adj[next][pointer] != 0) && !list_vertices_passados[next]){
+                list_vertices_passados[next] = true; 
+                line[end++] = next; // move pro proximo vertice
+            }
+        }
+    }   
+
+    bool C1true = true;
+    for(int idx = 0; idx < n; idx++){
+        if(!(list_vertices_passados[idx]))
+            C1true = false;
+    }
+    delete[] list_vertices_passados;
+    delete[] line;
+
+    return C1true ? C1:C0;  
 }
 
 // Funcionalidade Principal: Recomendador de Jogos
