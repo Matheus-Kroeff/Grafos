@@ -17,7 +17,15 @@ private:
     int *peso;             // Vetor de pesos dos vértices
     std::string *rotulos;  // Vetor com os nomes dos jogos
 
+
+
+	
+
+
 public:
+	enum Connexity {C0, C1, C2, C3};
+	
+
     graph_utils(int n);
     ~graph_utils();
 
@@ -46,7 +54,7 @@ public:
     void printGraph();
 
     // Opção i: Apresentar conexidade
-    void showConnectivity();
+    Connexity showConnectivity(int** &reduzida, int &quant_areas);
 
     // Funcionalidade Principal do Projeto
     void recomendar(int v);
