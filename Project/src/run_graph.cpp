@@ -201,8 +201,16 @@ int main() {
                 std::cout << "Encerrando a aplicacao...\n";
                 break;
 
-            default:
+            default: {
+                if (std::cin.eof()) {
+                    return 0;
+                }
+                std::cin.clear();
+                std::string entradaInvalida;
+                std::getline(std::cin, entradaInvalida);
                 std::cout << "Opcao invalida! Tente novamente.\n";
+                break;
+            }
         }
     } while (opcao != 11);
 
