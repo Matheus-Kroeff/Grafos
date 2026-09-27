@@ -1,6 +1,6 @@
 /*
 ===============================================================================
- Projeto : Linkindie - Sistema Recommend-a-Game (Teoria dos Grafos)
+ Projeto : Lykie - Sistema Recommend-a-Game (Teoria dos Grafos)
 
  Autores :
  - Andre Doerner Duarte - 10427938

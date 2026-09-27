@@ -1,4 +1,4 @@
-# Linkindie — Recomendador de jogos
+# Lykie — Recomendador de jogos
 
 Projeto em C++ que usa um grafo para recomendar jogos pela similaridade entre eles.
 
