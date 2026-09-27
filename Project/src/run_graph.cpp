@@ -76,6 +76,7 @@
               |                 |          | 2. Como rodar sem make
               |                 |          | 3. Como usar
               |                 |          | 4. O que cada arquivo faz
+  27/09/2026  | dedeDuarte      | c54a8eb  | Agora programa consegue achar arquivo dentro e fora de src/
 
  -----------------------------------------------------------------------------
 ===============================================================================
