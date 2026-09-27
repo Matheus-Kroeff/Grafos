@@ -1,4 +1,4 @@
-# Lykie — Recomendador de jogos
+# LYNKIE - Recomendador de jogos
 
 Projeto em C++ que usa um grafo para recomendar jogos pela similaridade entre eles.
 
@@ -45,15 +45,15 @@ Isso recria `grafos.txt` usando `games.json`. Não é necessário para rodar o p
 
 ```text
 Project/
-├── README.md           — Explica o projeto e como rodar.
-├── makefile            — Compila com make e remove o executável com make clean.
-├── .gitignore          — Evita enviar arquivos .out ao Git.
-├── run_graph.out       — Executável gerado pela compilação.
+├── README.md           - Explica o projeto e como rodar.
+├── makefile            - Compila com make e remove o executável com make clean.
+├── .gitignore          - Evita enviar arquivos .out ao Git.
+├── run_graph.out       - Executável gerado pela compilação.
 └── src/
-    ├── run_graph.cpp   — Mostra o menu e recebe as escolhas do usuário.
-    ├── graph_utils.h   — Declara a classe do grafo e suas funções.
-    ├── graph_utils.cpp — Implementa o grafo, os arquivos, a conexidade e as recomendações.
-    ├── grafos.txt      — Guarda os jogos e suas conexões de similaridade.
-    ├── games.json      — Contém os dados dos jogos usados pelo script Python.
-    └── gerar_grafo.py  — Gera grafos.txt usando as tags e os gêneros de games.json.
+    ├── run_graph.cpp   - Mostra o menu e recebe as escolhas do usuário.
+    ├── graph_utils.h   - Declara a classe do grafo e suas funções.
+    ├── graph_utils.cpp - Implementa o grafo, os arquivos, a conexidade e as recomendações.
+    ├── grafos.txt      - Guarda os jogos e suas conexões de similaridade.
+    ├── games.json      - Contém os dados dos jogos usados pelo script Python.
+    └── gerar_grafo.py  - Gera grafos.txt usando as tags e os gêneros de games.json.
 ```
