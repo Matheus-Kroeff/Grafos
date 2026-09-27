@@ -67,6 +67,16 @@
   25/09/2026  | Matheus-Kroeff  | d7043a0  | conexidade
   25/09/2026  | Matheus-Kroeff  | afdf147  | grafos.txt atualizado
   27/09/2026  | dedeDuarte      | c861f27  | Domentários expplicando código
+  27/09/2026  | dedeDuarte      | 8c039e5  | Tratamento caso entrada de caractere inválidos,
+              |                 |          | como 'a' -> 'Z'
+  27/09/2026  | dedeDuarte      | cece91e  | Códigos compilados removidos do repositório
+  27/09/2026  | dedeDuarte      | 44879b7  | Makefile e .gitignore adicionados
+  27/09/2026  | dedeDuarte      | 76339d2  | README adicionados e completo com:
+              |                 |          | 1. Como rodar com make
+              |                 |          | 2. Como rodar sem make
+              |                 |          | 3. Como usar
+              |                 |          | 4. O que cada arquivo faz
+
  -----------------------------------------------------------------------------
 ===============================================================================
 */
