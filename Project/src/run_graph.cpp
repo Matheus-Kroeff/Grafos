@@ -1,7 +1,74 @@
 /*
-- Andre Doerner Duarte - 10427938
-- Matheus Leonardo Cardoso Kroeff - 10426434
-- Naoto Ushizaki - 10437445
+===============================================================================
+ Projeto : Linkindie - Sistema Recommend-a-Game (Teoria dos Grafos)
+
+ Autores :
+ - Andre Doerner Duarte - 10427938
+ - Matheus Leonardo Cardoso Kroeff - 10426434
+ - Naoto Ushizaki - 10437445
+
+ Síntese do conteúdo:
+   Programa principal da aplicação. Apresenta um menu em loop que permite
+   manipular o grafo de jogos (classe graph_utils), representado por matriz
+   de adjacência, orientado e com peso nas arestas (tipo 6). Cada vértice é
+   um jogo e cada aresta u -> v indica a similaridade (%) entre os jogos.
+   Opções do menu:
+     a) ler o grafo do arquivo grafos.txt
+     b) gravar o grafo no arquivo grafos.txt
+     c) inserir vértice (novo jogo)
+     d) inserir aresta (nova similaridade)
+     e) remover vértice
+     f) remover aresta
+     g) mostrar o conteúdo do grafo (jogos e conexões)
+     h) mostrar a matriz de adjacência
+     i) apresentar a conexidade (C0 a C3) e o grafo reduzido
+     10) recomendador de jogos (funcionalidade principal)
+     j) encerrar a aplicação
+   Contém também a função auxiliar conexidadeParaTexto, que converte a
+   categoria de conexidade (enum Connexity) em texto.
+
+ Histórico de alterações:
+ -----------------------------------------------------------------------------
+  Data        | Autor           | Commit   | Descrição
+ -----------------------------------------------------------------------------
+  12/09/2026  | mackcoder       | 6ee807c  | Project e Relatorio criados
+  14/09/2026  | Matheus-Kroeff  | 6a7abbb  | Update graph_utils.cpp
+  23/09/2026  | Matheus-Kroeff  | 95d655f  | Update graph_utils.cpp
+  23/09/2026  | Matheus-Kroeff  | ac65e1e  | Refactor graph_utils class and
+              |                 |          | update header guards
+  23/09/2026  | Matheus-Kroeff  | 19bedd6  | Implement main function for graph
+              |                 |          | recommendation system
+  23/09/2026  | Matheus-Kroeff  | 070b3fa  | Update graph_utils.cpp
+  23/09/2026  | Matheus-Kroeff  | 3c34408  | Update graph_utils.cpp
+  23/09/2026  | Matheus-Kroeff  | f434e7a  | Add grafos.txt with game and edge
+              |                 |          | data
+  23/09/2026  | Matheus-Kroeff  | 3b21226  | Create gerar_grafo.py
+  24/09/2026  | Matheus-Kroeff  | 8dbc72d  | Update gerar_grafo.py
+  24/09/2026  | Matheus-Kroeff  | 82a728a  | testando
+  24/09/2026  | Matheus-Kroeff  | 08386aa  | ta funcionando, to tentando fazer a
+              |                 |          | criação do arquivo, passei tudo do
+              |                 |          | meu vscode para aqui agora
+  24/09/2026  | Matheus-Kroeff  | b4a75cf  | Create games.json
+  24/09/2026  | Matheus-Kroeff  | ce78a7e  | Update games.json
+  24/09/2026  | Matheus-Kroeff  | e9a4f04  | Update games.json
+  24/09/2026  | Matheus-Kroeff  | 725435d  | Update games.json
+  24/09/2026  | Matheus-Kroeff  | dee10c5  | teste com mais vertices
+  24/09/2026  | Matheus-Kroeff  | 8f9e082  | Identificação do grupo em todos os
+              |                 |          | arquivos
+  24/09/2026  | Matheus-Kroeff  | f025ad5  | Update games.json
+  24/09/2026  | mackcoder       | 13c358d  | Refactor showConnectivity to return
+              |                 |          | connexity
+  24/09/2026  | mackcoder       | bcb3f92  | Implement connectivity text
+              |                 |          | conversion and update case
+  24/09/2026  | mackcoder       | 76ed26e  | Modify showConnectivity to return
+              |                 |          | Connexity type
+  24/09/2026  | Matheus-Kroeff  | dde31b9  | Enhance documentation and comments
+              |                 |          | in gerar_grafo.py
+  25/09/2026  | Matheus-Kroeff  | d7043a0  | conexidade
+  25/09/2026  | Matheus-Kroeff  | afdf147  | grafos.txt atualizado
+  27/09/2026  | dedeDuarte      | c861f27  | Domentários expplicando código
+ -----------------------------------------------------------------------------
+===============================================================================
 */
 
 #include <iostream>
@@ -100,7 +167,7 @@ int main() {
                 grafo.printGraph();
                 break;
 
-            case 9: {// i) Conexidade 
+            case 9: {// i) Conexidade
                 int** reduzida;
                 int quant_areas;
                 graph_utils::Connexity resultado = grafo.showConnectivity(reduzida, quant_areas);
@@ -141,3 +208,4 @@ int main() {
 
     return 0;
 }
+
