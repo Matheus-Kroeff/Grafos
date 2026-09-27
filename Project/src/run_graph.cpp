@@ -81,6 +81,7 @@
 ===============================================================================
 */
 
+#include <fstream>
 #include <iostream>
 #include <string>
 #include "graph_utils.h"
@@ -99,6 +100,9 @@ int main() {
     graph_utils grafo(0);
     int opcao = 0;
     std::string arquivo = "grafos.txt";
+    if (!std::ifstream(arquivo) && std::ifstream("src/grafos.txt")) {
+        arquivo = "src/grafos.txt";
+    }
 
     std::cout << "===========================================================\n";
     std::cout << "   SYSTEM RECOMMEND-A-GAME (TEORIA DOS GRAFOS)             \n";
@@ -226,4 +230,3 @@ int main() {
 
     return 0;
 }
-
